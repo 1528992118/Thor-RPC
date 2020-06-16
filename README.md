@@ -1,5 +1,7 @@
 # THOR-PRC
 
+[![Build](https://img.shields.io/badge/build-netty-green.svg)]()&nbsp;[![Release](https://img.shields.io/badge/debug-1.0.0-blue.svg)]()&nbsp;[![Author](https://img.shields.io/badge/author-Xiaolong.Cao-yellow.svg)]()&nbsp;[![Time](https://img.shields.io/badge/time-2020.6.17-red.svg)]()&nbsp;
+
 > 本项目参考了[Dubbo](http://dubbo.apache.org/en-us/)部分结构，并参考了一些基于`Netty`的`RPC`实现，没有过多分装，实现较为简单，提供大家一个思路，方便理解`RPC`相关实现。
 > **适用初学并对`RPC`感兴趣的朋友，请在此基础上自由发挥**
 
