@@ -41,7 +41,7 @@
         <hessian>4.0.38</hessian>
         <kryo>3.0.3</kryo>
         <slf4j>1.7.7</slf4j>
-        <netty>4.1.32.Final</netty>
+        <netty>4.1.42.Final</netty>
         <reflections>0.9.10</reflections>
         <spring-boot>2.1.4.RELEASE</spring-boot>
     </properties>
