@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.cxl.thor.rpc</groupId>
+    <artifactId>thor-parent</artifactId>
+    <version>1.0.0</version>
+    <name>thor</name>
+
+    <modules>
+        <module>thor-config</module>
+        <module>thor-register</module>
+        <module>thor-common</module>
+        <module>thor-serialize</module>
+        <module>thor-core</module>
+        <module>thor-monitor</module>
+        <module>thor-demo</module>
+    </modules>
+
+    <packaging>pom</packaging>
+
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <junit_jupiter_version>5.6.0</junit_jupiter_version>
+        <curator.framework>2.11.1</curator.framework>
+        <curator-recipes>2.5.0</curator-recipes>
+        <jedis>2.9.0</jedis>
+        <thor-common>1.0.0</thor-common>
+        <thor-core>1.0.0</thor-core>
+        <thor-register>1.0.0</thor-register>
+        <thor-serialize>1.0.0</thor-serialize>
+        <thor-config>1.0.0</thor-config>
+        <demo-api>1.0.0</demo-api>
+        <fastjson>1.2.56</fastjson>
+        <hessian>4.0.38</hessian>
+        <kryo>3.0.3</kryo>
+        <slf4j>1.7.7</slf4j>
+        <netty>4.1.32.Final</netty>
+        <reflections>0.9.10</reflections>
+        <spring-boot>2.1.4.RELEASE</spring-boot>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.cxl.thor.rpc</groupId>
+            <artifactId>thor-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.cxl.thor.rpc</groupId>
+                <artifactId>thor-common</artifactId>
+                <version>${thor-common}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.cxl.thor.rpc</groupId>
+                <artifactId>thor-register</artifactId>
+                <version>${thor-register}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.cxl.thor.rpc</groupId>
+                <artifactId>thor-serialize</artifactId>
+                <version>${thor-serialize}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.cxl.thor.rpc</groupId>
+                <artifactId>thor-core</artifactId>
+                <version>${thor-core}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.cxl.thor.rpc</groupId>
+                <artifactId>demo-api</artifactId>
+                <version>${demo-api}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.cxl.thor.rpc</groupId>
+                <artifactId>thor-config</artifactId>
+                <version>${thor-config}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>${junit_jupiter_version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-framework</artifactId>
+                <version>${curator.framework}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>redis.clients</groupId>
+                <artifactId>jedis</artifactId>
+                <version>${jedis}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-recipes</artifactId>
+                <version>${curator-recipes}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.caucho</groupId>
+                <artifactId>hessian</artifactId>
+                <version>${hessian}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.esotericsoftware</groupId>
+                <artifactId>kryo</artifactId>
+                <version>${kryo}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${slf4j}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>${netty}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter</artifactId>
+                <version>${spring-boot}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-configuration-processor</artifactId>
+                <optional>true</optional>
+                <version>${spring-boot}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-aop</artifactId>
+                <version>${spring-boot}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>${spring-boot}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-test</artifactId>
+                <version>${spring-boot}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>${reflections}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>

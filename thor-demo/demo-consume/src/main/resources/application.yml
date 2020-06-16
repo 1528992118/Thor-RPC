@@ -1,0 +1,35 @@
+server:
+  port: 10002
+thor:
+  register:
+    address: redis://localhost:6379/0
+  consume:
+    scanPath: org.cxl.thor.rpc.demo.consume
+    serializer: hessian
+
+logging:
+  level:
+    root: error
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

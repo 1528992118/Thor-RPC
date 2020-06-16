@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+org.cxl.thor.rpc.config.spring.configuration.ServerAutoConfiguration,\
+org.cxl.thor.rpc.config.spring.configuration.ClientAutoConfiguration
