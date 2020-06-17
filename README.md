@@ -14,6 +14,7 @@
 * 基于`zoopker`和`redis`两种注册中心
 * 提供`Random`的负载均衡，可扩展
 * 集成`SpringBoot `快速启动
+* 提供`echo`回声探测
 
 
 
