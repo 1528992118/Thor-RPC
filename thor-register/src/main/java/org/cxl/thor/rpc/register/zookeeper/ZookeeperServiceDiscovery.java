@@ -1,11 +1,13 @@
 package org.cxl.thor.rpc.register.zookeeper;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.cxl.thor.rpc.common.URL;
 import org.cxl.thor.rpc.common.constant.RpcParamConstants;
+import org.cxl.thor.rpc.common.utils.CollectionUtils;
 import org.cxl.thor.rpc.common.utils.PropertiesUtils;
 import org.cxl.thor.rpc.register.EventListener;
 import org.cxl.thor.rpc.register.LoadBalance;
@@ -17,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URLDecoder;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -60,6 +63,29 @@ public class ZookeeperServiceDiscovery implements ServiceDiscovery, EventListene
         //注册监听
         this.registerListener(path);
         return getURL();
+    }
+
+    @Override
+    public List<URL> getAllServices(String name) {
+        List<URL> services = Lists.newArrayList();
+        String path = RpcParamConstants.getProviderPath(name);
+        try {
+            List<String> servicePaths = curatorFramework.getChildren().forPath(path);
+            if (CollectionUtils.isEmpty(servicePaths)) {
+                return services;
+            }
+            for (String service : servicePaths) {
+                services.add(URL.valueOf(URLDecoder.decode(service, "UTF-8")));
+            }
+        } catch (Exception e) {
+            log.error("fetch all services fail from zk, cause:{}", e.getMessage());
+        }
+        return services;
+    }
+
+    @Override
+    public Set<String> getAddressCache() {
+        return addressCache;
     }
 
     @Override

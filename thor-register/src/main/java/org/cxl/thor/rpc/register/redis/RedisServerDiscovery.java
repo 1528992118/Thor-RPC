@@ -1,9 +1,11 @@
 package org.cxl.thor.rpc.register.redis;
 
+import com.google.common.collect.Lists;
 import org.cxl.thor.rpc.common.URL;
 import org.cxl.thor.rpc.common.constant.RpcParamConstants;
 import org.cxl.thor.rpc.register.EventListener;
 import org.cxl.thor.rpc.register.LoadBalance;
+import org.cxl.thor.rpc.register.RegisterCallBack;
 import org.cxl.thor.rpc.register.ServiceDiscovery;
 import org.cxl.thor.rpc.register.redis.util.JedisPoolManager;
 import org.slf4j.Logger;
@@ -11,10 +13,7 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -75,6 +74,24 @@ public class RedisServerDiscovery implements ServiceDiscovery, EventListener<Str
         });
         return getURL();
     }
+
+    @Override
+    public List<URL> getAllServices(String name) {
+        List<URL> services = Lists.newArrayList();
+        String path = RpcParamConstants.getProviderPath(name);
+        Jedis jedis = JedisPoolManager.getInstance().build(address).getResource();
+        Map<String, String> map = jedis.hgetAll(path);
+        for (String key : map.keySet()) {
+            services.add(URL.valueOf(key));
+        }
+        return services;
+    }
+
+    @Override
+    public Set<String> getAddressCache() {
+        return addressCache;
+    }
+
 
     public class RedisListener extends JedisPubSub {
 

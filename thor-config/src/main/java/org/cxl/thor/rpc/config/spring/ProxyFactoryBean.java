@@ -11,7 +11,7 @@ public class ProxyFactoryBean<T> implements FactoryBean<T> {
 
     private Class<T> interfaceType;
 
-    private ClientProxyFactory<T> proxy;
+    private ClientProxyContext<T> proxy;
 
     @Override
     public T getObject() throws Exception {
@@ -36,11 +36,11 @@ public class ProxyFactoryBean<T> implements FactoryBean<T> {
         this.interfaceType = interfaceType;
     }
 
-    public ClientProxyFactory<T> getProxy() {
+    public ClientProxyContext<T> getProxy() {
         return proxy;
     }
 
-    public void setProxy(ClientProxyFactory<T> proxy) {
+    public void setProxy(ClientProxyContext<T> proxy) {
         this.proxy = proxy;
     }
 }

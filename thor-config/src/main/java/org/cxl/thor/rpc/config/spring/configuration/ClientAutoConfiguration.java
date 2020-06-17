@@ -1,20 +1,12 @@
 package org.cxl.thor.rpc.config.spring.configuration;
 
 import org.cxl.thor.rpc.common.utils.StringUtils;
+import org.cxl.thor.rpc.config.spring.ClientProxyContext;
 import org.cxl.thor.rpc.config.spring.ProxyFactoryBean;
-import org.cxl.thor.rpc.config.spring.SerializerUtil;
 import org.cxl.thor.rpc.config.spring.YmlUtil;
 import org.cxl.thor.rpc.config.spring.annotation.Consume;
 import org.cxl.thor.rpc.config.spring.properties.ConsumeProperties;
 import org.cxl.thor.rpc.config.spring.properties.RegistryProperties;
-import org.cxl.thor.rpc.core.client.ClientProxyFactory;
-import org.cxl.thor.rpc.core.client.net.NettyRpcClient;
-import org.cxl.thor.rpc.core.loadbalance.RandomLoadBalance;
-import org.cxl.thor.rpc.register.LoadBalance;
-import org.cxl.thor.rpc.register.ServiceDiscovery;
-import org.cxl.thor.rpc.register.redis.RedisServerDiscovery;
-import org.cxl.thor.rpc.register.zookeeper.ZookeeperServiceDiscovery;
-import org.cxl.thor.rpc.serialize.Serializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -36,6 +28,8 @@ import java.lang.reflect.Field;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.cxl.thor.rpc.common.constant.CommonConstants.JAVA_SERIALIZATION;
 
@@ -48,15 +42,13 @@ public class ClientAutoConfiguration implements BeanDefinitionRegistryPostProces
 
     private static final Logger log = LoggerFactory.getLogger(ClientAutoConfiguration.class);
 
-    private Serializer serializer;
-
-    private ClientProxyFactory clientProxyFactory;
-
-    private ServiceDiscovery serviceDiscovery;
-
     private ConsumeProperties consumeProperties;
 
     private RegistryProperties registryProperties;
+
+    private ClientProxyContext clientProxyContext = ClientProxyContext.getInstance();
+
+    private ExecutorService echoThreadPool = Executors.newFixedThreadPool(6);
 
     private ConsumeProperties getConsumeProperties() {
         ConsumeProperties consumeProperties = new ConsumeProperties();
@@ -93,10 +85,17 @@ public class ClientAutoConfiguration implements BeanDefinitionRegistryPostProces
                 if (!field.isAccessible()) {
                     field.setAccessible(true);
                 }
-                Consume consume = beanClass.getAnnotation(Consume.class);
+                Consume consume = field.getAnnotation(Consume.class);
+                if (null == consume) {
+                    continue;
+                }
                 Class<?> fieldClass = field.getType(); // 获取该标识下的类的类型，用于生成相应proxy
                 BeanDefinitionHolder holder = createBeanDefinition(fieldClass);
                 BeanDefinitionReaderUtils.registerBeanDefinition(holder, beanDefinitionRegistry);
+                //测活节点
+                echoThreadPool.submit(() -> {
+                    clientProxyContext.pingProviders(fieldClass);
+                });
             }
         }
     }
@@ -113,7 +112,7 @@ public class ClientAutoConfiguration implements BeanDefinitionRegistryPostProces
         String beanName = StringUtils.uncapitalize(className.substring(className.lastIndexOf('.') + 1));
         // 给ProxyFactoryBean字段赋值
         builder.addPropertyValue("interfaceType", fieldClass);
-        builder.addPropertyValue("proxy", clientProxyFactory);
+        builder.addPropertyValue("proxy", clientProxyContext);
         return new BeanDefinitionHolder(builder.getBeanDefinition(), beanName);
     }
 
@@ -125,30 +124,21 @@ public class ClientAutoConfiguration implements BeanDefinitionRegistryPostProces
         if (StringUtils.isEmpty(consumeProperties.getScanPath())) {
             return;
         }
-        LoadBalance loadBalance = new RandomLoadBalance();
-        serializer = SerializerUtil.getSerializer(Optional.ofNullable(consumeProperties.getSerializer()).orElse(JAVA_SERIALIZATION));
-        //初始化代理工厂
-        if (registryProperties.getAddress().startsWith("zookeeper://")) {
-            serviceDiscovery = new ZookeeperServiceDiscovery(registryProperties.getAddress().replaceAll("zookeeper://", "")
-                    , loadBalance);
-        } else if (registryProperties.getAddress().startsWith("redis")) {
-            serviceDiscovery = new RedisServerDiscovery(registryProperties.getAddress(), loadBalance);
-        }
-
-        clientProxyFactory = new ClientProxyFactory(new NettyRpcClient(serializer), serviceDiscovery);
+        clientProxyContext.load(registryProperties.getAddress()
+                , Optional.ofNullable(consumeProperties.getSerializer()).orElse(JAVA_SERIALIZATION));
     }
 
 
     private YmlUtil getYmlConfigurerUtil() {
-        //1:加载配置文件
+        //加载配置文件
         Resource app = new ClassPathResource("application.yml");
         Resource appDev = new ClassPathResource("application-dev.yml");
         Resource appProd = new ClassPathResource("application-prod.yml");
         Resource appTest = new ClassPathResource("application-test.yml");
         YamlPropertiesFactoryBean yamlPropertiesFactoryBean = new YamlPropertiesFactoryBean();
-        // 2:将加载的配置文件交给 YamlPropertiesFactoryBean
+        //将加载的配置文件交给 YamlPropertiesFactoryBean
         yamlPropertiesFactoryBean.setResources(app);
-        // 3：将yml转换成 key：val
+        //将yml转换成 key：val
         Properties properties = yamlPropertiesFactoryBean.getObject();
         String active = properties.getProperty("spring.profiles.active");
         if (StringUtils.isEmpty(active)) {
@@ -161,7 +151,7 @@ public class ClientAutoConfiguration implements BeanDefinitionRegistryPostProces
                 yamlPropertiesFactoryBean.setResources(app, appTest);
             }
         }
-        // 4: 将Properties 通过构造方法交给我们写的工具类
+        //将Properties 通过构造方法交给我们写的工具类
         return new YmlUtil(yamlPropertiesFactoryBean.getObject());
     }
 
