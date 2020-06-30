@@ -178,7 +178,7 @@ public void testConsumer() throws Exception {
 
 * **Thor-RPC 1.0.0 Build 2020/6/30**
 
-  > Client端新增Netty连接池方式；针对多个Provider，优化Client端调用；加入Echo回声探测，
+  > Client端新增Netty连接池方式；针对多个Provider，优化Client端调用；加入Echo回声探测
 
 ## Contact
 
