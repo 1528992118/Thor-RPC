@@ -7,10 +7,10 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import org.cxl.thor.rpc.common.Request;
 import org.cxl.thor.rpc.common.Response;
 import org.cxl.thor.rpc.common.URL;
+import org.cxl.thor.rpc.core.client.NetClient;
 import org.cxl.thor.rpc.serialize.Serializer;
 import org.cxl.thor.rpc.serialize.codec.NettyDecoder;
 import org.cxl.thor.rpc.serialize.codec.NettyEncoder;
@@ -34,9 +34,9 @@ public class NettyRpcClient implements NetClient {
     @Override
     public Response send(Request request, URL url) throws Throwable {
         final ClientChannelHandler clientChannelHandler = new ClientChannelHandler(request);
+        EventLoopGroup group = new NioEventLoopGroup(Math.max(2, Runtime.getRuntime().availableProcessors()) * 2);
         Response response;
         //配置客户端
-        EventLoopGroup group = new NioEventLoopGroup();
         try {
             Bootstrap b = new Bootstrap();
             b.group(group).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, true)
@@ -45,8 +45,8 @@ public class NettyRpcClient implements NetClient {
                         protected void initChannel(SocketChannel ch) {
                             ch.pipeline()
                                     .addLast(new NettyEncoder(serializer))
-                                    .addLast(new LengthFieldBasedFrameDecoder(65536, 0,
-                                            4, 0, 0))
+                                    /* .addLast(new LengthFieldBasedFrameDecoder(1048576, 0,
+                                             4, 0, 0))*/
                                     .addLast(new NettyDecoder(serializer))
                                     .addLast(clientChannelHandler);
                         }

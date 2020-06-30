@@ -6,6 +6,8 @@ public class Response implements Serializable {
 
     private static final long serialVersionUID = 6313260401594053637L;
 
+    private String requestId;
+
     private Status status;
 
     private String message;
@@ -16,23 +18,39 @@ public class Response implements Serializable {
         this.status = status;
     }
 
-    public Response(Status status, Object result) {
+    public Response(String requestId, Status status) {
+        this.requestId = requestId;
+        this.status = status;
+    }
+
+    public Response(String requestId, Status status, Object result) {
+        this.requestId = requestId;
         this.status = status;
         this.result = result;
     }
 
 
-    public Response(Status status, String message) {
+    public Response(String requestId, Status status, String message) {
+        this.requestId = requestId;
         this.status = status;
         this.message = message;
     }
 
-    public Response(Status status, String message, Object result) {
+    public Response(String requestId, Status status, String message, Object result) {
+        this.requestId = requestId;
         this.status = status;
         this.message = message;
         this.result = result;
     }
-    
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
+
     public Status getStatus() {
         return status;
     }

@@ -6,8 +6,8 @@ import org.cxl.thor.rpc.config.spring.properties.RegistryProperties;
 import org.cxl.thor.rpc.config.spring.properties.ServerProperties;
 import org.cxl.thor.rpc.core.server.JDKDynamicProxyHandler;
 import org.cxl.thor.rpc.core.server.net.NettyRpcServer;
-import org.cxl.thor.rpc.register.Registry;
 import org.cxl.thor.rpc.register.Provider;
+import org.cxl.thor.rpc.register.Registry;
 import org.cxl.thor.rpc.register.redis.RedisRegister;
 import org.cxl.thor.rpc.register.zookeeper.ZookeeperRegister;
 import org.cxl.thor.rpc.serialize.Serializer;
@@ -102,7 +102,6 @@ public class ServerAutoConfiguration implements ApplicationContextAware, Applica
             serializer = SerializerUtil.getSerializer(Optional.ofNullable(serverProperties.getSerializer())
                     .orElse(JAVA_SERIALIZATION));
 
-
             Optional.ofNullable(registryProperties.getAddress())
                     .orElse(DEFAULT_ZK_ADDRESS);
 
@@ -115,6 +114,7 @@ public class ServerAutoConfiguration implements ApplicationContextAware, Applica
             for (Object object : serverBeanMap.values()) {
                 try {
                     registry.register(decorate(object));
+                    log.info("provider's service[{}] has been exported", object.getClass().getName());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -127,13 +127,11 @@ public class ServerAutoConfiguration implements ApplicationContextAware, Applica
 
 
     private void start() {
-
         JDKDynamicProxyHandler requestHandler = new JDKDynamicProxyHandler(registry
                 , serializer);
         nettyRpcServer = new NettyRpcServer(host + ":" + port
                 , requestHandler);
         nettyRpcServer.start();
-
     }
 
     private void onContextClosedEvent() {

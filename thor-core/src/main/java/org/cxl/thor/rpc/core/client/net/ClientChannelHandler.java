@@ -1,7 +1,5 @@
 package org.cxl.thor.rpc.core.client.net;
 
-import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.cxl.thor.rpc.common.Request;
@@ -24,10 +22,12 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<Response> 
     private Object response = null;
     private CountDownLatch countDownLatch;
 
+
     public ClientChannelHandler(Request request) {
         this.request = request;
         countDownLatch = new CountDownLatch(1);
     }
+
 
     public Object responseData() {
         try {
@@ -43,7 +43,6 @@ public class ClientChannelHandler extends SimpleChannelInboundHandler<Response> 
         ctx.writeAndFlush(request);
         log.info("client -> client send message:[{}]", request.getRequestId());
     }
-
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Response resp) {

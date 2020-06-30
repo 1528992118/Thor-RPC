@@ -28,8 +28,6 @@ import java.lang.reflect.Field;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static org.cxl.thor.rpc.common.constant.CommonConstants.JAVA_SERIALIZATION;
 
@@ -47,8 +45,6 @@ public class ClientAutoConfiguration implements BeanDefinitionRegistryPostProces
     private RegistryProperties registryProperties;
 
     private ClientProxyContext clientProxyContext = ClientProxyContext.getInstance();
-
-    private ExecutorService echoThreadPool = Executors.newFixedThreadPool(6);
 
     private ConsumeProperties getConsumeProperties() {
         ConsumeProperties consumeProperties = new ConsumeProperties();
@@ -80,7 +76,7 @@ public class ClientAutoConfiguration implements BeanDefinitionRegistryPostProces
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
-            Field[] fields = beanClass.getDeclaredFields(); // 获得该Class的多有field
+            Field[] fields = beanClass.getDeclaredFields(); // 获得该Class的所有field
             for (Field field : fields) {
                 if (!field.isAccessible()) {
                     field.setAccessible(true);
@@ -92,10 +88,7 @@ public class ClientAutoConfiguration implements BeanDefinitionRegistryPostProces
                 Class<?> fieldClass = field.getType(); // 获取该标识下的类的类型，用于生成相应proxy
                 BeanDefinitionHolder holder = createBeanDefinition(fieldClass);
                 BeanDefinitionReaderUtils.registerBeanDefinition(holder, beanDefinitionRegistry);
-                //测活节点
-                echoThreadPool.submit(() -> {
-                    clientProxyContext.pingProviders(fieldClass);
-                });
+                log.info("consume's service[{}] has been registered to spring", fieldClass);
             }
         }
     }
@@ -154,6 +147,5 @@ public class ClientAutoConfiguration implements BeanDefinitionRegistryPostProces
         //将Properties 通过构造方法交给我们写的工具类
         return new YmlUtil(yamlPropertiesFactoryBean.getObject());
     }
-
 
 }

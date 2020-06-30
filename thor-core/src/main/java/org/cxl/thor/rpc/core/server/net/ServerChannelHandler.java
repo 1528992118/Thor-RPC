@@ -19,6 +19,7 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<Request> {
         this.handler = handler;
     }
 
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Request request) {
         Response response = handler.handlerRequest(request);

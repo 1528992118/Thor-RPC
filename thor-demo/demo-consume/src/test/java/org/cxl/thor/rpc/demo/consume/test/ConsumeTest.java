@@ -1,5 +1,6 @@
 package org.cxl.thor.rpc.demo.consume.test;
 
+import org.cxl.thor.rpc.common.rpc.EchoService;
 import org.cxl.thor.rpc.config.spring.annotation.Consume;
 import org.cxl.thor.rpc.demo.api.HelloService;
 import org.cxl.thor.rpc.demo.consume.ConsumeApplication;
@@ -22,12 +23,9 @@ public class ConsumeTest {
     HelloService helloService;
 
     @Test
-    public void test() throws IOException {
-        Long start = System.currentTimeMillis();
-        helloService.sayHello("word");
-        Long end = System.currentTimeMillis();
-        System.out.print(end - start);
-        System.in.read();
+    public void test() throws IOException, InterruptedException {
+        Object o = ((EchoService) helloService).$echo("111");
+        System.out.print("############################" + o.toString());
     }
 
 }

@@ -5,7 +5,6 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import org.cxl.thor.rpc.core.server.AbstractRequestHandler;
@@ -13,6 +12,8 @@ import org.cxl.thor.rpc.serialize.codec.NettyDecoder;
 import org.cxl.thor.rpc.serialize.codec.NettyEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.cxl.thor.rpc.common.constant.CommonConstants.SYSTEM_PROPERTY_PARALLEL;
 
 public class NettyRpcServer extends NetServer {
 
@@ -27,7 +28,7 @@ public class NettyRpcServer extends NetServer {
     @Override
     public void start() {
         EventLoopGroup bossLoopGroup = new NioEventLoopGroup();
-        EventLoopGroup workLoopGroup = new NioEventLoopGroup();
+        EventLoopGroup workLoopGroup = new NioEventLoopGroup(SYSTEM_PROPERTY_PARALLEL * 2);
         ServerBootstrap serverBootstrap = new ServerBootstrap();
 
         serverBootstrap.group(bossLoopGroup, workLoopGroup).channel(NioServerSocketChannel.class)
@@ -39,9 +40,9 @@ public class NettyRpcServer extends NetServer {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {
+                        /*ByteBuf delimiter = Unpooled.copiedBuffer(DELIMITER.getBytes());*/
                         ch.pipeline()
-                                .addLast(new LengthFieldBasedFrameDecoder(65536, 0,
-                                        4, 0, 0))
+                                /* .addLast(new DelimiterBasedFrameDecoder(Integer.MAX_VALUE, delimiter))*/
                                 .addLast(new NettyDecoder(getHandler().getSerializer()))
                                 .addLast(new NettyEncoder(getHandler().getSerializer()))
                                 .addLast(new ServerChannelHandler(getHandler()));
@@ -49,7 +50,6 @@ public class NettyRpcServer extends NetServer {
                 });
 
         try {
-
             String[] array = getAddress().split(":");
             String host = array[0];
             int port = Integer.parseInt(array[1]);

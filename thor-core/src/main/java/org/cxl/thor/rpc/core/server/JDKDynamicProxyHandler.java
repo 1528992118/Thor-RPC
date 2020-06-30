@@ -4,8 +4,8 @@ import org.cxl.thor.rpc.common.Request;
 import org.cxl.thor.rpc.common.Response;
 import org.cxl.thor.rpc.common.Status;
 import org.cxl.thor.rpc.common.exception.ThorException;
-import org.cxl.thor.rpc.register.Registry;
 import org.cxl.thor.rpc.register.Provider;
+import org.cxl.thor.rpc.register.Registry;
 import org.cxl.thor.rpc.serialize.Serializer;
 
 import java.lang.reflect.Method;
@@ -26,17 +26,25 @@ public class JDKDynamicProxyHandler extends AbstractRequestHandler {
         //获取处理对象
         Provider provider = getRegistry().getProvider(request.getServiceName());
         Response response;
+
+        //前置判断该方法是否是回声测试，若为回声测试，则直接返回入参
+        if ("$echo".equals(request.getMethodName())) {
+            return new Response(request.getRequestId(), Status.SUCCESS
+                    , request.getParameterValues()[0]);
+        }
+
         if (provider == null) {
-            response = new Response(Status.NOT_FOUND);
+            response = new Response(request.getRequestId(), Status.NOT_FOUND);
         } else {
             //利用反射调用
             try {
                 Method method = provider.getServiceInterfaceClass().getMethod(request.getMethodName()
                         , request.getParameterTypes());
                 Object obj = method.invoke(provider.getServiceInstance(), request.getParameterValues());
-                response = new Response(Status.SUCCESS, obj);
+                response = new Response(request.getRequestId(), Status.SUCCESS, obj);
             } catch (Exception e) {
-                response = new Response(Status.ERROR, new ThorException(JDK_REFLECT_ERROR, e.getCause()));
+                response = new Response(request.getRequestId(), Status.ERROR
+                        , new ThorException(JDK_REFLECT_ERROR, e.getCause()));
             }
         }
         return response;

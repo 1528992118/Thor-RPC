@@ -5,8 +5,8 @@ import org.cxl.thor.rpc.common.URL;
 import org.cxl.thor.rpc.common.rpc.EchoService;
 import org.cxl.thor.rpc.common.utils.CollectionUtils;
 import org.cxl.thor.rpc.core.client.ClientInvocationHandler;
-import org.cxl.thor.rpc.core.client.net.NetClient;
-import org.cxl.thor.rpc.core.client.net.NettyRpcClient;
+import org.cxl.thor.rpc.core.client.NetClient;
+import org.cxl.thor.rpc.core.client.pool.NettyClientPool;
 import org.cxl.thor.rpc.core.loadbalance.RandomLoadBalance;
 import org.cxl.thor.rpc.register.LoadBalance;
 import org.cxl.thor.rpc.register.ServiceDiscovery;
@@ -60,7 +60,8 @@ public class ClientProxyContext<T> {
         } else if (address.startsWith("redis")) {
             this.serviceDiscovery = new RedisServerDiscovery(address, loadBalance);
         }
-        this.netClient = new NettyRpcClient(serializer);
+        this.netClient = NettyClientPool.getInstance();
+        ((NettyClientPool) this.netClient).load(serializer);
     }
 
     public void pingProviders(List<URL> urls) {
@@ -76,6 +77,7 @@ public class ClientProxyContext<T> {
                     .parameterValues(new String[]{"ping"}).build();
             try {
                 netClient.send(request, url);
+                serviceDiscovery.getAddressCache().add(url.valueOf());
             } catch (Throwable throwable) {
                 serviceDiscovery.getAddressCache().remove(url.valueOf());
                 log.error("ping url:{} fail,cause:{}", url.valueOf(), throwable.getCause());

@@ -1,6 +1,5 @@
 package org.cxl.thor.rpc.core.client;
 
-import org.cxl.thor.rpc.core.client.net.NetClient;
 import org.cxl.thor.rpc.register.ServiceDiscovery;
 
 import java.lang.reflect.Proxy;
