@@ -176,7 +176,9 @@ public void testConsumer() throws Exception {
 
   > 首版构建，基于`netty`网络框架，提供`zk`和`redis`两种注册中心，提供`java`和`hessian`序列化方式
 
+* **Thor-RPC 1.0.0 Build 2020/6/30**
 
+  > Client端新增Netty连接池方式；针对多个Provider，优化Client端调用；加入Echo回声探测，
 
 ## Contact
 
