@@ -43,7 +43,7 @@
         <slf4j>1.7.7</slf4j>
         <netty>4.1.42.Final</netty>
         <reflections>0.9.10</reflections>
-        <spring-boot>2.1.4.RELEASE</spring-boot>
+        <spring-boot>2.5.12</spring-boot>
     </properties>
 
     <dependencies>
