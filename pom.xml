@@ -37,7 +37,7 @@
         <thor-serialize>1.0.0</thor-serialize>
         <thor-config>1.0.0</thor-config>
         <demo-api>1.0.0</demo-api>
-        <fastjson>1.2.56</fastjson>
+        <fastjson>1.2.83</fastjson>
         <hessian>4.0.38</hessian>
         <kryo>3.0.3</kryo>
         <slf4j>1.7.7</slf4j>
